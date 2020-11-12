@@ -1,10 +1,10 @@
 package qee
 
 import (
+	"QeeWeb/qee/base"
 	"QeeWeb/qee/router"
 	"fmt"
 	"net/http"
-	"QeeWeb/qee/base"
 )
 
 type qeeWeb struct {
@@ -17,7 +17,7 @@ func New(r router.Router) *qeeWeb {
 	}
 }
 
-func (qee *qeeWeb) GetRegistered(rule string, f func(ctx *base.Context)) error{
+func (qee *qeeWeb) GetRegistered(rule string, f func(ctx *base.Context)) error {
 	err := qee.RegisteredHandler(http.MethodGet, rule, f)
 	if err != nil {
 		return err

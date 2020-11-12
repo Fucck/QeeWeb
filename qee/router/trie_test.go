@@ -9,7 +9,7 @@ import (
 func TestTrieRouter_RegisteredHandler_absParse(t *testing.T) {
 	pattern := "/hello/world"
 	router := NewTrieRouter()
-	f := func(ctx *base.Context){}
+	f := func(ctx *base.Context) {}
 	err := router.RegisteredHandler(http.MethodGet, pattern, f)
 	if err != nil {
 		t.Error(err)
@@ -26,7 +26,7 @@ func TestTrieRouter_RegisteredHandler_absParse(t *testing.T) {
 func TestTrieRouter_RegisteredHandler_HalfPattern(t *testing.T) {
 	pattern := "/hello/:name"
 	router := NewTrieRouter()
-	f := func(ctx *base.Context){}
+	f := func(ctx *base.Context) {}
 	err := router.RegisteredHandler(http.MethodGet, pattern, f)
 	if err != nil {
 		t.Error(err)

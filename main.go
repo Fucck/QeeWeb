@@ -1,11 +1,11 @@
 package main
 
 import (
+	"QeeWeb/qee"
 	"QeeWeb/qee/base"
 	"QeeWeb/qee/router"
 	"fmt"
 	"net/http"
-	"QeeWeb/qee"
 )
 
 func indexHandler(writer http.ResponseWriter, req *http.Request) {
@@ -18,7 +18,7 @@ func helloHandler(writer http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func main(){
+func main() {
 	router := router.NewTrieRouter()
 	handler := qee.New(router)
 	handler.RegisteredHandler("GET", "/index/:name", func(ctx *base.Context) {

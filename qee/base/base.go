@@ -6,21 +6,21 @@ import (
 )
 
 type Context struct {
-	Writer http.ResponseWriter
-	Req *http.Request
-	Path string
-	Method string
+	Writer     http.ResponseWriter
+	Req        *http.Request
+	Path       string
+	Method     string
 	StatusCode int
-	QueryMap map[string]string
+	QueryMap   map[string]string
 }
 
 // call by ServeHttp only
 func NewContext(w http.ResponseWriter, req *http.Request) *Context {
 	return &Context{
-		Writer: w,
-		Req: req,
-		Path: req.URL.Path,
-		Method: req.Method,
+		Writer:     w,
+		Req:        req,
+		Path:       req.URL.Path,
+		Method:     req.Method,
 		StatusCode: http.StatusNotFound,
 	}
 }

@@ -9,30 +9,30 @@ import (
 
 type trieRouter struct {
 	handlerMap map[string]func(ctx *base.Context) // pattern: handler
-	root *trieNode
+	root       *trieNode
 }
 
 type trieNode struct {
-	pattern string
-	part string
+	pattern  string
+	part     string
 	children []*trieNode
-	isWild bool
+	isWild   bool
 }
 
 func NewTrieRouter() *trieRouter {
 	return &trieRouter{
 		handlerMap: map[string]func(ctx *base.Context){},
 		root: &trieNode{
-			pattern: "",
-			part: "/",
+			pattern:  "",
+			part:     "/",
 			children: []*trieNode{},
-			isWild: false,
+			isWild:   false,
 		},
 	}
 }
 
 func (r *trieRouter) DisplayUrlPattern() {
-	for k ,_ := range r.handlerMap {
+	for k, _ := range r.handlerMap {
 		fmt.Println(k)
 	}
 }
@@ -61,10 +61,10 @@ func (node *trieNode) insertNode(pattern string, parts []string) {
 		return
 	} else if len(parts) == 1 {
 		child := &trieNode{
-			pattern: pattern,
-			part: parts[0],
+			pattern:  pattern,
+			part:     parts[0],
 			children: []*trieNode{},
-			isWild: strings.HasPrefix(parts[0], ":") || strings.HasPrefix(parts[0], "*"),
+			isWild:   strings.HasPrefix(parts[0], ":") || strings.HasPrefix(parts[0], "*"),
 		}
 		node.children = append(node.children, child)
 		return
@@ -73,10 +73,10 @@ func (node *trieNode) insertNode(pattern string, parts []string) {
 	child := node.MatchChild(parts[0])
 	if child == nil {
 		child = &trieNode{
-			pattern: "",
-			part: parts[0],
+			pattern:  "",
+			part:     parts[0],
 			children: []*trieNode{},
-			isWild: strings.HasPrefix(parts[0], ":") || strings.HasPrefix(parts[0], "*"),
+			isWild:   strings.HasPrefix(parts[0], ":") || strings.HasPrefix(parts[0], "*"),
 		}
 		node.children = append(node.children, child)
 	}
@@ -168,6 +168,6 @@ func (r *trieRouter) FindHandler(method string, path string) (func(ctx *base.Con
 	}
 	patternMap := map[string]string{}
 	node := r.root.searchNode(parts, patternMap)
-	handler := r.handlerMap[method + "-" + node.pattern]
+	handler := r.handlerMap[method+"-"+node.pattern]
 	return handler, patternMap
 }
