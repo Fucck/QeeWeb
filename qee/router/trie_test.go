@@ -1,58 +1,61 @@
 package router
 
 import (
+	"QeeWeb/qee/base"
+	"net/http"
 	"testing"
 )
 
 func TestTrieRouter_RegisteredHandler_absParse(t *testing.T) {
 	pattern := "/hello/world"
 	router := NewTrieRouter()
-	err := router.RegisteredHandler(pattern)
+	f := func(ctx *base.Context){}
+	err := router.RegisteredHandler(http.MethodGet, pattern, f)
 	if err != nil {
 		t.Error(err)
 		t.Fail()
 		return
 	}
 
-	node := router.FindHandler(pattern)
-	if node == nil {
-		t.Fail()
-		return
-	}
-	if node.isWild || node.pattern != pattern {
-		t.Error("node pattern is: ", node.pattern)
+	handler, _ := router.FindHandler(http.MethodGet, pattern)
+	if handler == nil {
 		t.Fail()
 	}
-	t.Log(node)
 }
 
 func TestTrieRouter_RegisteredHandler_HalfPattern(t *testing.T) {
 	pattern := "/hello/:name"
 	router := NewTrieRouter()
-	err := router.RegisteredHandler(pattern)
+	f := func(ctx *base.Context){}
+	err := router.RegisteredHandler(http.MethodGet, pattern, f)
 	if err != nil {
 		t.Error(err)
 		t.Fail()
 		return
 	}
 	url := "/hello/mike"
-	node := router.FindHandler(url)
-	if node == nil {
+	handler, patternMap := router.FindHandler(http.MethodGet, url)
+	if handler == nil {
 		t.Fail()
 		return
 	}
-	if !node.isWild || node.part != ":name" {
-		t.Error("node pattern is : ", node.pattern)
-		t.Fail()
+	t.Log(patternMap)
+	router.DisplayUrlPattern()
+	if val, exist := patternMap["name"]; exist {
+		if val != "mike" {
+			t.Log("name: ", val, " error")
+			t.Fail()
+		}
+	} else {
+		t.Log("key name not exist")
 	}
-	t.Log(node)
 }
 
 func TestTrieRouter_RegisteredHandler_AllPattern(t *testing.T) {
 	patterns := []string{"/hello/mike", "/hello/:name/age", "/hello/*person"}
 	router := NewTrieRouter()
 	for _, pattern := range patterns {
-		if err := router.RegisteredHandler(pattern); err != nil {
+		if err := router.RegisteredHandler(http.MethodGet, pattern, nil); err != nil {
 			t.Error(err)
 			t.Fail()
 			return
@@ -60,24 +63,19 @@ func TestTrieRouter_RegisteredHandler_AllPattern(t *testing.T) {
 	}
 
 	url := "/hello/mike/male"
-	node := router.FindHandler(url)
-	if node == nil {
-		t.Error("can not find a node")
-		t.Fail()
-		return
-	}
-	if !node.isWild || node.part != "*person" {
-		t.Error("node pattern is : ", node.pattern)
+	_, patternMap := router.FindHandler(http.MethodGet, url)
+	t.Log("patternMap:", patternMap)
+	if patternMap["person"] != "mike/male" {
+		t.Log("person: ", patternMap["person"])
 		t.Fail()
 	}
-	t.Log(node)
 }
 
 func TestTrieRouter_RegisteredHandler_Priority(t *testing.T) {
 	patterns := []string{"/hello/mike", "/hello/:name/age", "/hello/*person"}
 	router := NewTrieRouter()
 	for _, pattern := range patterns {
-		if err := router.RegisteredHandler(pattern); err != nil {
+		if err := router.RegisteredHandler(http.MethodGet, pattern, nil); err != nil {
 			t.Error(err)
 			t.Fail()
 			return
@@ -86,18 +84,18 @@ func TestTrieRouter_RegisteredHandler_Priority(t *testing.T) {
 
 	url1 := "/hello/mike"
 	url2 := "/hello/mike/age"
-	url3 := "/hello"
+	url3 := "/hello/jack/class"
 
-	if node := router.FindHandler(url1); node == nil || node.part != "mike" {
-		t.Log(node)
+	if _, queryDict := router.FindHandler(http.MethodGet, url1); len(queryDict) != 0 {
+		t.Log(queryDict)
 		t.Fail()
 	}
-	if node := router.FindHandler(url2); node == nil || node.part != "age" {
-		t.Log(node)
+	if _, queryDict := router.FindHandler(http.MethodGet, url2); queryDict["name"] != "mike" {
+		t.Log(queryDict)
 		t.Fail()
 	}
-	if node := router.FindHandler(url3); node != nil {
-		t.Log(node)
+	if _, queryDict := router.FindHandler(http.MethodGet, url3); queryDict["person"] != "jack/class" {
+		t.Log(queryDict)
 		t.Fail()
 	}
 }

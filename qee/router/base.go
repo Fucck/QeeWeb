@@ -1,8 +1,10 @@
 package router
 
-import "QeeWeb/qee"
+import (
+	"QeeWeb/qee/base"
+)
 
 type Router interface {
-	RegisteredHandler(pattern string, handler func(ctx *qee.Context))
-	FindHandler(path string) func(ctx *qee.Context)
+	RegisteredHandler(method string, pattern string, handler func(ctx *base.Context)) error
+	FindHandler(method string, path string) (func(ctx *base.Context), map[string]string)
 }

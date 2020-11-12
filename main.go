@@ -1,6 +1,8 @@
 package main
 
 import (
+	"QeeWeb/qee/base"
+	"QeeWeb/qee/router"
 	"fmt"
 	"net/http"
 	"QeeWeb/qee"
@@ -17,23 +19,13 @@ func helloHandler(writer http.ResponseWriter, req *http.Request) {
 }
 
 func main(){
-	handler := qee.New()
-	handler.GetRegistered("/", func(ctx *qee.Context) {
-		ctx.String(http.StatusOK, fmt.Sprintf("URL.PATH = %s", ctx.Path))
+	router := router.NewTrieRouter()
+	handler := qee.New(router)
+	handler.RegisteredHandler("GET", "/index/:name", func(ctx *base.Context) {
+		fmt.Println(ctx.QueryMap)
 	})
-	handler.PostRegistered("/hello", func(ctx *qee.Context) {
-		name := ctx.PostForm("name")
-		if name != "" {
-			ctx.Json(200, struct {
-				Name string `json:"name"`
-				Msg string `json:"msg"`
-			}{
-				Name: name,
-				Msg: "Hello!",
-			})
-		} else {
-			ctx.String(http.StatusBadRequest, "wrong post body")
-		}
+	handler.RegisteredHandler("GET", "/*allpath", func(ctx *base.Context) {
+		fmt.Println(ctx.QueryMap)
 	})
 	handler.Run(":8000")
 }
